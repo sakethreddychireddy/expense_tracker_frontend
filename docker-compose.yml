@@ -1,0 +1,11 @@
+services:
+  react-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: my-react-app
+    environment:
+      - API_BASE_URL = http:loclahost:8081/api/
+    ports:
+      - "3000:80"
