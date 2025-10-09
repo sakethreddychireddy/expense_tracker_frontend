@@ -1,10 +1,10 @@
 # Stage 1: Build the React application
-FROM node:18-alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
+COPY package.json package-lock.json ./
+RUN npm -v
 RUN npm install
-COPY . ./
+COPY . .
 RUN npm run build
 
 # Stage 2: Serve the built application with Nginx
