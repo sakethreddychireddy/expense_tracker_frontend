@@ -5,8 +5,8 @@ import {
   UpdateExpenseDto,
 } from "../types/expense";
 
-const API_BASE_URL = "http://localhost:5048/api/ExpenseTracker";
-const API_URL = "http://localhost:5048/api/RecurringExpense";
+const API_BASE_URL = (process.env?.API_BASE_URL || "http://localhost:5048/api/") + "ExpenseTracker";
+const API_URL = (process.env?.API_BASE_URL || "http://localhost:5048/api/") + "RecurringExpense";
 
 // Helper to get headers with token
 const getAuthHeaders = () => {
