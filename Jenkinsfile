@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo '📥 Cloning repository...'
-                git branch: "${main}", url: 'https://github.com/sakethreddychireddy/expense_tracker_frontend.git'
+                git branch: "${BRANCH_NAME}", url: 'https://github.com/sakethreddychireddy/expense_tracker_frontend.git'
             }
         }
 
@@ -37,6 +37,7 @@ pipeline {
             }
         }
 
+        // Optional: Uncomment if you want to push to Docker Hub later
         // stage('Push to Docker Hub') {
         //     steps {
         //         echo '📤 Pushing Docker image to Docker Hub...'
@@ -57,10 +58,9 @@ pipeline {
             steps {
                 echo '🚀 Deploying container...'
                 script {
-                    // Stop and remove existing container if running
                     sh """
                         docker ps -q --filter "name=react_app_container" | grep -q . && docker stop react_app_container && docker rm react_app_container || true
-                        docker run -d -p 3000:80 --name react_app_container ${DOCKER_IMAGE}:latest
+                        docker run -d -p 3000:80 --name react_app_container ${DOCKER_IMAGE}:${BUILD_NUMBER}
                     """
                 }
             }
