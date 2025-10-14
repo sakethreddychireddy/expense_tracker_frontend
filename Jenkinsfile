@@ -9,7 +9,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo '📥 Cloning repository...'
+                echo '📥 Cloning repository...',
+                credentialsId: 'github-access-token',
                 git branch: "${BRANCH_NAME}", url: 'https://github.com/sakethreddychireddy/expense_tracker_frontend.git'
             }
         }
