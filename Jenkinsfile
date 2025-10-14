@@ -9,9 +9,12 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo '📥 Cloning repository...',
-                credentialsId: 'github-access-token',
-                git branch: "${BRANCH_NAME}", url: 'https://github.com/sakethreddychireddy/expense_tracker_frontend.git'
+                echo '📥 Cloning repository...'
+                git(
+                    branch: "${BRANCH_NAME}",
+                    credentialsId: 'github-access-token',
+                    url: 'https://github.com/sakethreddychireddy/expense_tracker_frontend.git'
+                )
             }
         }
 
@@ -59,6 +62,7 @@ pipeline {
             steps {
                 echo '🚀 Deploying container...'
                 script {
+                    // Stop and remove existing container if it exists
                     sh """
                         docker ps -q --filter "name=react_app_container" | grep -q . && docker stop react_app_container && docker rm react_app_container || true
                         docker run -d -p 3000:80 --name react_app_container ${DOCKER_IMAGE}:${BUILD_NUMBER}
