@@ -3,18 +3,16 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'expense_tracker/react-frontend'
-        BRANCH_NAME = 'main'   // Change if using another branch
+        BRANCH_NAME = 'main'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo '📥 Cloning repository...'
-                git(
-                    branch: "${BRANCH_NAME}",
-                    credentialsId: 'github-access-token',
-                    url: 'https://github.com/sakethreddychireddy/expense_tracker_frontend.git'
-                )
+                git branch: "${BRANCH_NAME}",
+                    url: 'https://github.com/sakethreddychireddy/expense_tracker_frontend.git',
+                    credentialsId: 'github-access-token'
             }
         }
 
@@ -37,36 +35,21 @@ pipeline {
                 echo '🐳 Building Docker image...'
                 script {
                     sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+                    sh "docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest"
                 }
             }
         }
-
-        // Optional: Uncomment if you want to push to Docker Hub later
-        // stage('Push to Docker Hub') {
-        //     steps {
-        //         echo '📤 Pushing Docker image to Docker Hub...'
-        //         script {
-        //             withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-        //                 sh """
-        //                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-        //                     docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
-        //                     docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
-        //                     docker push ${DOCKER_IMAGE}:latest
-        //                 """
-        //             }
-        //         }
-        //     }
-        // }
 
         stage('Deploy Container') {
             steps {
                 echo '🚀 Deploying container...'
                 script {
-                    // Stop and remove existing container if it exists
-                    sh """
-                        docker ps -q --filter "name=react_app_container" | grep -q . && docker stop react_app_container && docker rm react_app_container || true
-                        docker run -d -p 3000:80 --name react_app_container ${DOCKER_IMAGE}:${BUILD_NUMBER}
-                    """
+                    sh '''
+                        docker ps -q --filter "name=react_app_container" | grep -q . && \
+                        docker stop react_app_container && docker rm react_app_container || true
+
+                        docker run -d -p 3000:80 --name react_app_container ${DOCKER_IMAGE}:latest
+                    '''
                 }
             }
         }
@@ -74,10 +57,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deployment successful! App is running at http://192.168.1.213:3000"
+            echo "✅ Deployment successful! Your app is live at: http://:3000"
         }
         failure {
-            echo "❌ Build or deployment failed!"
+            echo "❌ Build or deployment failed. Check Jenkins logs for details."
         }
     }
 }
