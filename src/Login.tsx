@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Login as loginUser } from "./api/expenseApi";
 import "./Login.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -113,13 +113,13 @@ const Login: React.FC = () => {
             <button className="login-btn" type="submit">
               Login
             </button>
-            <div className="register-link">
+            {/* <div className="register-link">
               Don't have an account? &nbsp;
               <a href="/Register">Register</a>
-            </div>
-            {/* <div className="register-link">
-              Don't have an account? <Link to="/register">Register</Link>
             </div> */}
+            <div className="register-link">
+              Don't have an account? <Link to="/Register">Register</Link>
+            </div>
           </form>
         )}
       </div>
