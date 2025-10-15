@@ -41,18 +41,33 @@ pipeline {
         }
 
         stage('Deploy Container') {
-            steps {
-                echo '🚀 Deploying container...'
-                script {
-                    sh '''
-                        docker ps -q --filter "name=react_app_container" | grep -q . && \
-                        docker stop react_app_container && docker rm react_app_container || true
+    steps {
+        echo '🚀 Deploying container...'
+        script {
+            sh '''
+                echo "🧭 Checking for existing container..."
+                if [ "$(docker ps -aq -f name=react_app_container)" ]; then
+                    echo "📦 Stopping existing container..."
+                    docker stop react_app_container || true
 
-                        docker run -d -p 3000:80 --name react_app_container ${DOCKER_IMAGE}:latest
-                    '''
-                }
-            }
+                    TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+                    ARCHIVE_NAME="react_app_container_${TIMESTAMP}"
+                    echo "🗄️ Archiving old container as: $ARCHIVE_NAME"
+                    docker rename react_app_container $ARCHIVE_NAME || true
+                fi
+
+                echo "🧹 Cleaning up dangling images..."
+                docker image prune -f || true
+
+                echo "🚀 Running new container..."
+                docker run -d -p 3000:80 --name react_app_container ${DOCKER_IMAGE}:latest
+
+                echo "✅ Deployment complete!"
+            '''
         }
+    }
+}
+
     }
 
     post {
