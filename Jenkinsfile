@@ -45,7 +45,10 @@ pipeline {
         echo '🚀 Deploying container...'
         script {
             sh '''
-                echo "🧭 Checking for existing container..."
+                echo "🧭 Checking for existing containers using port 3000..."
+                docker ps -q --filter "publish=3000" | xargs -r docker stop || true
+                docker ps -aq --filter "publish=3000" | xargs -r docker rm || true
+                echo "Checking for existing container named react_app_container..."
                 if [ "$(docker ps -aq -f name=react_app_container)" ]; then
                     echo "📦 Stopping existing container..."
                     docker stop react_app_container || true
