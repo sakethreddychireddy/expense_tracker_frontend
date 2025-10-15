@@ -57,7 +57,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deployment successful! Your app is live at: http://:3000"
+            echo "✅ Deployment successful! Your app is live"
         }
         failure {
             echo "❌ Build or deployment failed. Check Jenkins logs for details."
