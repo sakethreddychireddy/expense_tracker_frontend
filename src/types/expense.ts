@@ -3,21 +3,23 @@ export interface Expense {
   title: string;
   amount: number;
   date: string;
-  category: string;
+  categoryName: string;
+  categoryId: number;
 }
 
 export interface CreateExpenseDTO {
   title: string;
   amount: number;
   date: string;
-  category: string;
+  categoryId: number;
   UserId: number;
 }
 export interface UpdateExpenseDto {
   title: string;
   amount: number;
   date: string;
-  category: string;
+  categoryName: string;
+  categoryId: number;
 }
 export interface RecurringExpenseDto {
   id: number;
@@ -51,4 +53,16 @@ export interface UpdateRecurringExpenseDto {
   endDate?: string;
   UserId: number;
   isActive: boolean;
+}
+export interface CategorySpending {
+  categoryName: string;
+  totalAmount: number;
+}
+export interface Category {
+  id: number;
+  name: string;
+}
+export interface MonthlyExpense {
+  month: string;
+  totalAmount: number;
 }

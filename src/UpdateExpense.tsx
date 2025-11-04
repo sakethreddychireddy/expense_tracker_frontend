@@ -1,24 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getExpenseById, updateExpense } from "./api/expenseApi";
+import { getExpenseById, updateExpense, GetCategories } from "./api/expenseApi";
 import { Expense } from "./types/expense";
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 const UpdateExpense: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [expense, setExpense] = useState<Expense | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchExpense = async () => {
+    const fetchData = async () => {
       if (id) {
-        const data = await getExpenseById(Number(id));
-        setExpense(data);
+        const expenseData = await getExpenseById(Number(id));
+        setExpense(expenseData);
       }
+      const categoryData = await GetCategories(); // fetch categories from backend
+      setCategories(categoryData);
       setLoading(false);
     };
-    fetchExpense();
+    fetchData();
   }, [id]);
 
   const handleChange = (
@@ -34,6 +42,8 @@ const UpdateExpense: React.FC = () => {
                 ? Number(value)
                 : name === "date"
                 ? new Date(value).toISOString()
+                : name === "categoryId"
+                ? Number(value)
                 : value,
           }
         : prev
@@ -44,9 +54,17 @@ const UpdateExpense: React.FC = () => {
     e.preventDefault();
     if (!expense) return;
     try {
-      await updateExpense(expense.id!, expense);
+      await updateExpense(expense.id, {
+        title: expense.title,
+        amount: expense.amount,
+        date: expense.date,
+        categoryId: expense.categoryId,
+        categoryName: ""
+      });
+      alert("Expense updated successfully ✅");
       navigate("/GetAllExpenses");
     } catch (error) {
+      console.error(error);
       alert("Failed to update expense ❌");
     }
   };
@@ -120,12 +138,11 @@ const UpdateExpense: React.FC = () => {
           }}
         />
 
-        <input
-          type="text"
-          name="category"
-          value={expense.category}
+        {/* ✅ Category Dropdown */}
+        <select
+          name="categoryId"
+          value={expense.categoryId}
           onChange={handleChange}
-          placeholder="Enter Category"
           required
           style={{
             padding: 10,
@@ -134,7 +151,14 @@ const UpdateExpense: React.FC = () => {
             outline: "none",
             fontSize: 14,
           }}
-        />
+        >
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
 
         <input
           type="date"
@@ -162,7 +186,6 @@ const UpdateExpense: React.FC = () => {
             fontSize: 16,
             fontWeight: "bold",
             cursor: "pointer",
-            transition: "0.3s ease",
           }}
           onMouseOver={(e) =>
             ((e.target as HTMLButtonElement).style.backgroundColor = "#218838")
@@ -173,6 +196,7 @@ const UpdateExpense: React.FC = () => {
         >
           Save Changes
         </button>
+
         <button
           type="button"
           onClick={() => navigate("/GetAllExpenses")}
@@ -185,7 +209,6 @@ const UpdateExpense: React.FC = () => {
             fontSize: 16,
             fontWeight: "bold",
             cursor: "pointer",
-            transition: "0.3s ease",
           }}
           onMouseOver={(e) =>
             ((e.target as HTMLButtonElement).style.backgroundColor = "#0069d9")

@@ -94,8 +94,9 @@ const ExpenseList = () => {
               <FiSettings /> Settings
             </button>
             <button
+              style={{ color: "red" }}
               onClick={() => {
-                alert("Logging out...");
+                localStorage.removeItem("authToken");
                 navigate("/login");
               }}
             >
@@ -161,9 +162,11 @@ const ExpenseList = () => {
                     </td>
                     <td>
                       <span
-                        className={`badge badge-${exp.category.toLowerCase()}`}
+                        className={`badge badge-${exp.categoryName
+                          ?.toLowerCase()
+                          .replace(/\s+/g, "")}`}
                       >
-                        {exp.category}
+                        {exp.categoryName}
                       </span>
                     </td>
                     <td>{new Date(exp.date).toLocaleDateString()}</td>
@@ -319,15 +322,16 @@ const ExpenseList = () => {
           border-radius: 12px;
           font-size: 0.85rem;
           font-weight: 600;
-          color: #fff;
+          color: #333;
           text-transform: capitalize;
         }
         .badge-food { background: #ef5350; }
-        .badge-travel { background: #42a5f5; }
-        .badge-shopping { background: #ffa726; }
-        .badge-bills { background: #7e57c2; }
+        .badge-transportation { background: #42a5f5; }
+        .badge-utilities { background: #ffa726; }
+        .badge-healthcare { background: #7e57c2; }
         .badge-entertainment { background: #ec407a; }
         .badge-education { background: #26a69a; }
+        .badge-miscellaneous { background: #8d6e63; }
         .actions {
           display: flex;
           gap: 0.6rem;
