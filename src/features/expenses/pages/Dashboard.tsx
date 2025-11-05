@@ -1,23 +1,29 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { CategorySpending } from "../types/expense";
 import { GetSpendingByCategory, Logout } from "../../../api/expenseApi";
-
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  PieChart,
+  Pie,
   Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
-  Legend,
   Cell,
+  ResponsiveContainer,
+  Sector,
 } from "recharts";
-
 import "./Dashboard.css";
+
+const COLORS = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff8042",
+  "#8dd1e1",
+  "#a4de6c",
+  "#d0ed57",
+  "#bc5090",
+];
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -27,16 +33,12 @@ const Dashboard: React.FC = () => {
   const [categorySpending, setCategorySpending] = useState<CategorySpending[]>(
     []
   );
-  // const [monthlyExpenses, setMonthlyExpenses] = useState<MonthlyExpense[]>([]);
-  // const fetchMonthlyExpenses = async () => {
-  //   try {
-  //     const data = await getMonthlyExpenses();
-  //     setMonthlyExpenses(data);
-  //   } catch (error) {
-  //     console.error("Error fetching monthly expenses", error);
-  //     setMonthlyExpenses([]);
-  //   }
-  // };
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  // Keep a sorted copy (descending by totalAmount) so the pie renders sorted
+  const sortedData = useMemo(() => {
+    return [...categorySpending].sort((a, b) => b.totalAmount - a.totalAmount);
+  }, [categorySpending]);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -48,10 +50,9 @@ const Dashboard: React.FC = () => {
     GetSpendingByCategory()
       .then((data) => setCategorySpending(data))
       .catch((err) => console.error("Error fetching category spending:", err));
-
-    // fetchMonthlyExpenses();
   }, [navigate]);
 
+  // Close dropdown menu on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -66,6 +67,83 @@ const Dashboard: React.FC = () => {
     (sum, item) => sum + item.totalAmount,
     0
   );
+
+  // ✅ Label renderer for PieChart (use Recharts label props -> payload)
+  const renderLabel = (props: any) => {
+    const entry = (props.payload || {}) as CategorySpending;
+    const percentage = totalSpending
+      ? ((entry.totalAmount / totalSpending) * 100).toFixed(1)
+      : "0.0";
+    return `${entry.categoryName} (${percentage}%)`;
+  };
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (!active || !payload || !payload.length) return null;
+    const item = payload[0];
+    return (
+      <div className="dashboard-tooltip">
+        <div className="tooltip-label">
+          {item.name || item.payload?.categoryName}
+        </div>
+        <div className="tooltip-value">${Number(item.value).toFixed(2)}</div>
+      </div>
+    );
+  };
+
+  // Active shape renderer: expand the selected slice slightly
+  const renderActiveShape = (props: any) => {
+    const {
+      cx,
+      cy,
+      innerRadius,
+      outerRadius,
+      startAngle,
+      endAngle,
+      fill,
+      payload,
+      value,
+    } = props;
+
+    const expanded = (outerRadius || 0) + 12;
+    return (
+      <g>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={expanded}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={expanded}
+          outerRadius={expanded + 6}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+          opacity={0.12}
+        />
+        <text x={cx} y={cy} dy={8} textAnchor="middle" className="active-label">
+          {payload?.categoryName || payload?.name}
+        </text>
+        <text
+          x={cx}
+          y={cy}
+          dy={26}
+          textAnchor="middle"
+          className="active-value"
+        >
+          ${Number(value).toFixed(2)}
+        </text>
+      </g>
+    );
+  };
+
+  // Recharts typings don't expose activeIndex on Pie in this version; use a typed alias
+  const AnyPie: any = Pie;
 
   return (
     <div className="dashboard-layout">
@@ -90,21 +168,20 @@ const Dashboard: React.FC = () => {
 
       {/* Main Content */}
       <div className="dashboard-main">
-        {/* Profile */}
+        {/* Profile Menu */}
         <div className="profile-menu" ref={menuRef}>
           <FaUserCircle
             className="profile-icon"
             size={40}
             onClick={() => setShowMenu(!showMenu)}
           />
-
           {showMenu && (
             <div className="dropdown-menu">
               <button onClick={() => navigate("/settings")}>
                 <FiSettings /> Settings
               </button>
               <button
-                style={{ color: "red" }}
+                className="logout-button"
                 onClick={async () => {
                   await Logout();
                   navigate("/login");
@@ -116,88 +193,77 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
-        <h2
-          className="dashboard-title"
-          style={{ textAlign: "center", color: "blue" }}
-        >
-          Expense Tracker Dashboard
-        </h2>
+        {/* Title */}
+        <h2 className="dashboard-title">Expense Tracker Dashboard</h2>
 
-        {/* Category Spending */}
-        <div className="category-section">
-          <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
-            💰 Spending by Category
-          </h3>
-          <p
-            className="total-text"
-            style={{
-              color: "#e5290cff", // green color
-              fontWeight: "bold",
-              fontSize: "25px",
-              textAlign: "center",
-            }}
-          >
-            Total: ${totalSpending.toFixed(2)}
-          </p>
-
-          <div className="category-card-grid">
-            {categorySpending.map((cat, i) => (
-              <div key={i} className="category-card">
-                <h4>{cat.categoryName}</h4>
-                <p>${cat.totalAmount.toFixed(2)}</p>
-              </div>
-            ))}
-          </div>
+        {/* Total Spending Summary */}
+        <div className="total-spending">
+          <h3 className="total-text">💰 Total Spending</h3>
+          <p className="total-amount">${totalSpending.toFixed(2)}</p>
         </div>
 
-        {/* Chart */}
-        {/* <div className="chart-section">
-          <h3>📅 Expenses By Month</h3>
+        {/* Category Summary Cards */}
+        <div className="category-card-grid">
+          {sortedData.map((cat, i) => (
+            <div
+              key={i}
+              className="category-card"
+              onClick={() => setActiveIndex(i === activeIndex ? null : i)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter")
+                  setActiveIndex(i === activeIndex ? null : i);
+              }}
+            >
+              <h4>{cat.categoryName}</h4>
+              <p className="category-amount">${cat.totalAmount.toFixed(2)}</p>
+            </div>
+          ))}
+        </div>
 
-          <ResponsiveContainer width="95%" height={300}>
-            <BarChart data={monthlyExpenses}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="totalAmount" barSize={50} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div> */}
-        <div className="category-spending">
-          <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
-            📊 Spending by Category
-          </h3>
-          {/* Additional content can go here */}
-          <ResponsiveContainer width="95%" height={450}>
-            <BarChart data={categorySpending}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="categoryName" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              {/* <Bar dataKey="totalAmount" barSize={50} /> */}
-              <Bar dataKey="totalAmount">
-                {categorySpending.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={
-                      [
-                        "#8884d8",
-                        "#82ca9d",
-                        "#ffc658",
-                        "#ff8042",
-                        "#8dd1e1",
-                        "#a4de6c",
-                        "#d0ed57",
-                      ][index % 7]
-                    }
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+        {/* Pie Chart Section */}
+        <div className="chart-section">
+          <h3 className="chart-title">📊 Spending by Category</h3>
+
+          {sortedData.length > 0 ? (
+            <ResponsiveContainer width="95%" height={400}>
+              <PieChart>
+                <AnyPie
+                  data={sortedData as any}
+                  dataKey="totalAmount"
+                  nameKey="categoryName"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={150}
+                  labelLine={false}
+                  label={renderLabel}
+                  onClick={(data: any, index: number) =>
+                    setActiveIndex(index === activeIndex ? null : index)
+                  }
+                  activeIndex={activeIndex === null ? -1 : activeIndex}
+                  activeShape={renderActiveShape}
+                >
+                  {sortedData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      className={
+                        activeIndex === null
+                          ? "pie-slice"
+                          : activeIndex === index
+                          ? "pie-slice pie-slice--active"
+                          : "pie-slice pie-slice--dimmed"
+                      }
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </AnyPie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="no-data">No data available to display the chart.</p>
+          )}
         </div>
       </div>
     </div>

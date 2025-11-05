@@ -94,6 +94,13 @@ const AddRecurringExpense: React.FC = () => {
           value={form.frequency}
           onChange={handleChange}
           required
+          style={{
+            padding: 10,
+            borderRadius: 6,
+            border: "1px solid #ccc",
+            outline: "none",
+            fontSize: 14,
+          }}
         >
           <option>Daily</option>
           <option>Weekly</option>
