@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getExpenseById, updateExpense, GetCategories } from "./api/expenseApi";
-import { Expense } from "./types/expense";
+import {
+  getExpenseById,
+  updateExpense,
+  GetCategories,
+} from "../../../api/expenseApi";
+import { Expense } from "../types/expense";
 
 interface Category {
   id: number;
@@ -59,7 +63,7 @@ const UpdateExpense: React.FC = () => {
         amount: expense.amount,
         date: expense.date,
         categoryId: expense.categoryId,
-        categoryName: ""
+        categoryName: "",
       });
       alert("Expense updated successfully ✅");
       navigate("/GetAllExpenses");

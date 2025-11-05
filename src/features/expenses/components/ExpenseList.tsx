@@ -5,7 +5,8 @@ import {
   getAllExpenses,
   deleteExpense,
   getTotalExpenses,
-} from "../api/expenseApi";
+  Logout,
+} from "../../../api/expenseApi";
 import { FaUserCircle } from "react-icons/fa"; // profile icon
 import { FiSettings, FiLogOut } from "react-icons/fi"; // menu icons
 
@@ -95,8 +96,8 @@ const ExpenseList = () => {
             </button>
             <button
               style={{ color: "red" }}
-              onClick={() => {
-                localStorage.removeItem("authToken");
+              onClick={async () => {
+                await Logout();
                 navigate("/login");
               }}
             >

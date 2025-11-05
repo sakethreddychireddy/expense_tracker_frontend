@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Register as registerUser } from "./api/expenseApi";
+import { Register as registerUser } from "../../../api/expenseApi";
 import { useNavigate, Link } from "react-router-dom";
 import "./Register.css";
 

@@ -1,17 +1,17 @@
 import "./App.css";
-import AddExpense from "./components/AddExpense";
-import ExpenseList from "./components/ExpenseList";
+import AddExpense from "./features/expenses/components/AddExpense";
+import ExpenseList from "./features/expenses/components/ExpenseList";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
-import UpdateExpense from "./UpdateExpense";
-import Home from "./Home";
-import Register from "./Register";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
+import UpdateExpense from "./features/expenses/components/UpdateExpense";
+import Home from "./features/expenses/pages/Home";
+import Register from "./features/auth/Components/Register";
+import Login from "./features/auth/Components/Login";
+import Dashboard from "./features/expenses/pages/Dashboard";
 import MonthlyExpenseChart from "./MonthlyExpenseChart";
-import AddRecurringExpense from "./AddRecurringExpense";
-import ViewRecurringExpense from "./ViewRecurrencingExpense";
-import UpdateRecurringExpense from "./UpdateRecurringExpense";
+import AddRecurringExpense from "./features/expenses/components/AddRecurringExpense";
+import ViewRecurringExpense from "./features/expenses/components/ViewRecurrencingExpense";
+import UpdateRecurringExpense from "./features/expenses/components/UpdateRecurringExpense";
 
 function App() {
   return (

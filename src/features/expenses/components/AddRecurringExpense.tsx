@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AddRecurringExpense as apiAddRecurring } from "./api/expenseApi";
-import { CreateRecurringExpenseDTO } from "./types/expense";
+import { AddRecurringExpense as apiAddRecurring } from "../../../api/expenseApi";
+import { CreateRecurringExpenseDTO } from "../types/expense";
 
 const AddRecurringExpense: React.FC = () => {
   const navigate = useNavigate();

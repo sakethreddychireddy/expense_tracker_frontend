@@ -3,7 +3,7 @@ import {
   CreateExpenseDTO,
   RecurringExpenseDto,
   UpdateExpenseDto,
-} from "../types/expense";
+} from "../features/expenses/types/expense";
 
 const API_BASE_URL =
   (process.env?.API_BASE_URL || "http://localhost:5048/api/") +

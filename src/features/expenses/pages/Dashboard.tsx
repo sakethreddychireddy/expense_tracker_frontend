@@ -2,13 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { FiSettings, FiLogOut } from "react-icons/fi";
-
-import { CategorySpending, MonthlyExpense } from "./types/expense";
-import {
-  GetSpendingByCategory,
-  getMonthlyExpenses,
-  Logout,
-} from "./api/expenseApi";
+import { CategorySpending } from "../types/expense";
+import { GetSpendingByCategory, Logout } from "../../../api/expenseApi";
 
 import {
   BarChart,

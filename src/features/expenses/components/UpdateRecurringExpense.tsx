@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   getRecurringExpenseById,
   updateRecurringExpense,
-} from "./api/expenseApi";
-import { RecurringExpenseDto } from "./types/expense";
+} from "../../../api/expenseApi";
+import { RecurringExpenseDto } from "../types/expense";
 
 const UpdateRecurringExpense = () => {
   const { id } = useParams<{ id: string }>();

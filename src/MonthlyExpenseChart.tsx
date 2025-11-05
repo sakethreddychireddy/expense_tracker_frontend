@@ -11,7 +11,7 @@ import {
   Legend,
 } from "recharts";
 import { getMonthlyExpenses } from "./api/expenseApi";
-import { MonthlyExpense } from "./types/expense";
+import { MonthlyExpense } from "./features/expenses/types/expense";
 const MonthlyExpenseChart: React.FC = () => {
   const [monthlyExpenses, setMonthlyExpenses] = useState<MonthlyExpense[]>([]);
   const [loading, setLoading] = useState(true);

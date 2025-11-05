@@ -1,7 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteRecurringExpense, getRecurringExpenses } from "./api/expenseApi";
-import { RecurringExpenseDto } from "./types/expense";
+import {
+  getRecurringExpenses,
+  deleteRecurringExpense,
+  Logout,
+} from "../../../api/expenseApi";
+import { RecurringExpenseDto } from "../types/expense";
 import { FaUserCircle } from "react-icons/fa"; // profile icon
 import { FiSettings, FiLogOut } from "react-icons/fi"; // menu icons
 
@@ -97,8 +101,9 @@ const ViewRecurringExpense = () => {
               <FiSettings /> Settings
             </button>
             <button
-              onClick={() => {
-                alert("Logging out...");
+              style={{ color: "red" }}
+              onClick={async () => {
+                await Logout();
                 navigate("/login");
               }}
             >

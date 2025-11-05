@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { createExpense } from "../api/expenseApi";
-import { GetCategories } from "../api/expenseApi";
+import { createExpense } from "../../../api/expenseApi";
+import { GetCategories } from "../../../api/expenseApi";
 import { CreateExpenseDTO } from "../types/expense";
 
 const AddExpense = () => {
