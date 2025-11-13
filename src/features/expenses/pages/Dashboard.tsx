@@ -203,7 +203,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Category Summary Cards */}
-        <div className="category-card-grid">
+        {/* <div className="category-card-grid">
           {sortedData.map((cat, i) => (
             <div
               key={i}
@@ -220,11 +220,11 @@ const Dashboard: React.FC = () => {
               <p className="category-amount">${cat.totalAmount.toFixed(2)}</p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Pie Chart Section */}
         <div className="chart-section">
-          <h3 className="chart-title">📊 Spending by Category</h3>
+          <h3 className="chart-title">Summary Of Spendings By Category</h3>
 
           {sortedData.length > 0 ? (
             <ResponsiveContainer width="95%" height={400}>

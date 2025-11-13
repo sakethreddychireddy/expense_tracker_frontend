@@ -7,18 +7,22 @@ import {
   getTotalExpenses,
   Logout,
 } from "../../../api/expenseApi";
-import { FaUserCircle } from "react-icons/fa"; // profile icon
-import { FiSettings, FiLogOut } from "react-icons/fi"; // menu icons
+import { FaUserCircle } from "react-icons/fa";
+import { FiSettings, FiLogOut } from "react-icons/fi";
+import "./ExpenseList.css";
 
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState<number>(0);
   const [showMenu, setShowMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [timePeriod, setTimePeriod] = useState<string>("all");
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -33,6 +37,7 @@ const ExpenseList = () => {
     try {
       const data = await getAllExpenses();
       setExpenses(data);
+      setFilteredExpenses(data);
     } catch (error) {
       console.error("Error fetching expenses", error);
     } finally {
@@ -55,6 +60,7 @@ const ExpenseList = () => {
       try {
         const res = await deleteExpense(id);
         setExpenses((prev) => prev.filter((exp) => exp.id !== id));
+        setFilteredExpenses((prev) => prev.filter((exp) => exp.id !== id));
         if (res.updatedTotal !== undefined) {
           setTotal(res.updatedTotal);
         } else {
@@ -64,6 +70,57 @@ const ExpenseList = () => {
         console.error(error);
       }
     }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    const lowerCaseQuery = query.toLowerCase();
+    const filtered = expenses.filter(
+      (exp) =>
+        exp.title.toLowerCase().includes(lowerCaseQuery) ||
+        exp.categoryName?.toLowerCase().includes(lowerCaseQuery)
+    );
+    setFilteredExpenses(filtered);
+  };
+
+  const handleSort = () => {
+    const sorted = [...filteredExpenses].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
+    setFilteredExpenses(sorted);
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  };
+
+  const handleTimePeriodChange = (period: string) => {
+    setTimePeriod(period);
+    const now = new Date();
+    let filtered = expenses;
+
+    if (period === "weekly") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(now.getDate() - 7);
+      filtered = expenses.filter((exp) => new Date(exp.date) >= oneWeekAgo);
+    } else if (period === "monthly") {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(now.getMonth() - 1);
+      filtered = expenses.filter((exp) => new Date(exp.date) >= oneMonthAgo);
+    } else if (period === "quarterly") {
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(now.getMonth() - 3);
+      filtered = expenses.filter((exp) => new Date(exp.date) >= threeMonthsAgo);
+    } else if (period === "midyear") {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(now.getMonth() - 6);
+      filtered = expenses.filter((exp) => new Date(exp.date) >= sixMonthsAgo);
+    } else if (period === "yearly") {
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(now.getFullYear() - 1);
+      filtered = expenses.filter((exp) => new Date(exp.date) >= oneYearAgo);
+    }
+
+    setFilteredExpenses(filtered);
   };
 
   useEffect(() => {
@@ -106,41 +163,80 @@ const ExpenseList = () => {
           </div>
         )}
       </div>
+
       <div className="card">
-        {/* 🔹 Header */}
-        <div className="header">
-          <h2>💰 Expense Tracker</h2>
-          {/* Back Button */}
-          <button
-            onClick={() => navigate("/Dashboard")}
+        {/* Header */}
+        <h3 className="header" style={{ textAlign: "center" }}>
+          📋 Expense List
+        </h3>
+        <p
+          className="total-expense"
+          style={{ textAlign: "center", fontSize: "20px" }}
+        >
+          Total Expenses: <b color="red">${total.toFixed(2)}</b>
+        </p>
+        <button
+          onClick={() => navigate("/Dashboard")}
+          style={{
+            position: "absolute",
+            top: 90,
+            right: 20,
+            padding: "10px 15px",
+            backgroundColor: "#4f46e5",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            transition: "background-color 0.3s ease",
+            fontWeight: "bold",
+            fontSize: "14px",
+          }}
+        >
+          Back
+        </button>
+
+        {/* Search, Sort, and Time Period Controls */}
+        <div className="controls">
+          <input
+            type="text"
+            placeholder="🔍 Search by title or category"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="search-bar"
             style={{
-              padding: "10px 15px",
-              backgroundColor: "#4f46e5",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-              transition: "background-color 0.3s ease",
-              fontWeight: "bold",
+              marginRight: "10px",
+              width: "60%",
+              padding: "8px",
               fontSize: "14px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)",
             }}
-          >
-            Back
+          />
+          <button onClick={handleSort} className="sort-button">
+            Sort by Date ({sortOrder === "asc" ? "Ascending" : "Descending"})
           </button>
-        </div>
-        {/* 🔹 Total Expenses */}
-        <div className="summary-card">
-          <h3>Total Spent</h3>
-          <p>${total.toFixed(2)}</p>
+          <select
+            value={timePeriod}
+            onChange={(e) => handleTimePeriodChange(e.target.value)}
+            className="time-period-dropdown"
+          >
+            <option value="all">All Time</option>
+            <option value="weekly">Last Week</option>
+            <option value="monthly">Last Month</option>
+            <option value="quarterly">Last Quarter</option>
+            <option value="midyear">Last 6 Months</option>
+            <option value="yearly">Last Year</option>
+          </select>
         </div>
 
-        {/* 🔹 Table or Empty State */}
+        {/* Table or Empty State */}
         {loading ? (
           <p className="loading">Loading expenses...</p>
-        ) : expenses.length === 0 ? (
+        ) : filteredExpenses.length === 0 ? (
           <div className="empty">
-            <p>🚀 No expenses yet. Start adding your first one!</p>
+            <p>🚀 No expenses found. Try adjusting your search!</p>
           </div>
         ) : (
           <div className="table-wrapper">
@@ -155,7 +251,7 @@ const ExpenseList = () => {
                 </tr>
               </thead>
               <tbody>
-                {expenses.map((exp) => (
+                {filteredExpenses.map((exp) => (
                   <tr key={exp.id}>
                     <td>{exp.title}</td>
                     <td className="amount">
@@ -192,182 +288,6 @@ const ExpenseList = () => {
           </div>
         )}
       </div>
-
-      {/* Styles */}
-      <style>{`
-        .modern-container {
-          display: flex;
-          justify-content: center;
-          padding: 2rem;
-          background: #f4f7fc;
-          min-height: 100vh;
-        }
-          .profile {
-          position: relative;
-        }
-        .profile-icon {
-          font-size: 2.5rem;
-          color: #1a237e;
-          cursor: pointer;
-          transition: transform 0.2s, color 0.2s;
-        }
-        .profile-icon:hover {
-          transform: scale(1.1);
-          color: #0d47a1;
-        }
-        .card {
-          background: #fff;
-          border-radius: 16px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-          padding: 2rem;
-          width: 100%;
-          max-width: 1100px;
-          animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1.5rem;
-        }
-        .header h2 {
-          font-size: 2rem;
-          font-weight: 700;
-          color: #1a237e;
-        }
-        
-        .dropdown {
-          position: absolute;
-          right: 0;
-          top: 3rem;
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-          overflow: hidden;
-          animation: slideDown 0.2s ease-in-out;
-        }
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .dropdown button {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.8rem 1.2rem;
-          border: none;
-          background: none;
-          font-size: 1rem;
-          color: #333;
-          cursor: pointer;
-          width: 100%;
-          transition: background 0.2s;
-        }
-        .dropdown button:hover {
-          background: #f4f7fc;
-          color: #0d47a1;
-        }
-        .summary-card {
-          background: linear-gradient(135deg, #42a5f5, #478ed1);
-          color: #fff;
-          border-radius: 12px;
-          padding: 1.5rem;
-          text-align: center;
-          margin-bottom: 1.5rem;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .summary-card h3 {
-          margin: 0;
-          font-size: 1.2rem;
-          font-weight: 500;
-        }
-        .summary-card p {
-          font-size: 2rem;
-          font-weight: 700;
-          margin-top: 0.5rem;
-        }
-        .table-wrapper {
-          overflow-x: auto;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          background: #fff;
-          border-radius: 12px;
-          overflow: hidden;
-        }
-        thead {
-          background: #1a237e;
-          color: #fff;
-        }
-        th, td {
-          padding: 1rem;
-          text-align: center;
-          font-size: 1rem;
-          border-bottom: 1px solid #eee;
-        }
-        tbody tr:hover {
-          background: #f4f7fc;
-        }
-        .amount {
-          font-weight: 600;
-          color: #333;
-        }
-        .badge {
-          display: inline-block;
-          padding: 0.3rem 0.8rem;
-          border-radius: 12px;
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #333;
-          text-transform: capitalize;
-        }
-        .badge-food { background: #ef5350; }
-        .badge-transportation { background: #42a5f5; }
-        .badge-utilities { background: #ffa726; }
-        .badge-healthcare { background: #7e57c2; }
-        .badge-entertainment { background: #ec407a; }
-        .badge-education { background: #26a69a; }
-        .badge-miscellaneous { background: #8d6e63; }
-        .actions {
-          display: flex;
-          gap: 0.6rem;
-          justify-content: center;
-        }
-        .edit, .delete {
-          padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 8px;
-          font-size: 0.9rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        .edit {
-          background: #42a5f5;
-          color: #fff;
-        }
-        .edit:hover {
-          background: #1e88e5;
-        }
-        .delete {
-          background: #ef5350;
-          color: #fff;
-        }
-        .delete:hover {
-          background: #c62828;
-        }
-        .loading, .empty {
-          text-align: center;
-          font-size: 1.2rem;
-          color: #666;
-          padding: 2rem 0;
-        }
-      `}</style>
     </div>
   );
 };

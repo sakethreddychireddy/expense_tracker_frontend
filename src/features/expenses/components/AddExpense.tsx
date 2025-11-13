@@ -42,10 +42,10 @@ const AddExpense = () => {
 
     if (!formData.title.trim()) {
       errors.title = "Title is required.";
-    } else if (!/^[a-zA-Z][a-zA-Z]*$/.test(formData.title.trim())) {
+        } else if (!/^[a-zA-Z][a-zA-Z\s0-9]*$/.test(formData.title.trim())) {
       errors.title =
-      "Title must start with an alphabet, contain only alphabets, and have no spaces.";
-    } else if (formData.title.trim().length < 3) {
+        "Title must start with an alphabet, contain only alphabets and spaces, and have no leading spaces.";
+        } else if (formData.title.trim().length < 3) {
       errors.title = "Title must be at least 3 characters.";
     }
 
@@ -127,7 +127,7 @@ const AddExpense = () => {
           id="amount"
           type="number"
           name="amount"
-          value={formData.amount}
+          value={formData.amount || ""}
           placeholder="minimum $1"
           onChange={handleChange}
           required

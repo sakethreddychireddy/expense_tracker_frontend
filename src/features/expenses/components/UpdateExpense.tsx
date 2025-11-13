@@ -88,7 +88,6 @@ const UpdateExpense: React.FC = () => {
       </div>
     );
   }
-
   return (
     <div style={{ maxWidth: 500, margin: "20px auto", textAlign: "center" }}>
       <form
@@ -148,6 +147,7 @@ const UpdateExpense: React.FC = () => {
           value={expense.categoryId}
           onChange={handleChange}
           required
+          className="category-select"
           style={{
             padding: 10,
             borderRadius: 6,

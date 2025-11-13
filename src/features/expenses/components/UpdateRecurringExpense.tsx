@@ -55,23 +55,26 @@ const UpdateRecurringExpense = () => {
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: '40px',
-        gap: '15px'
-      }}>
-        <div style={{
-          width: '40px',
-          height: '40px',
-          border: '4px solid #f3f3f3',
-          borderTop: '4px solid #3498db',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-        }}>
-        </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "40px",
+          gap: "15px",
+        }}
+      >
+        <div
+          style={{
+            width: "40px",
+            height: "40px",
+            border: "4px solid #f3f3f3",
+            borderTop: "4px solid #3498db",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
         <style>
           {`
             @keyframes spin {
@@ -80,11 +83,13 @@ const UpdateRecurringExpense = () => {
             }
           `}
         </style>
-        <p style={{
-          color: '#666',
-          fontSize: '16px',
-          fontWeight: 500
-        }}>
+        <p
+          style={{
+            color: "#666",
+            fontSize: "16px",
+            fontWeight: 500,
+          }}
+        >
           Loading expense...
         </p>
       </div>
@@ -152,12 +157,10 @@ const UpdateRecurringExpense = () => {
           }}
         />
 
-        <input
-          type="text"
-          name="category"
+        <select
+          name="Category"
           value={expense.category}
           onChange={handleChange}
-          placeholder="Enter Category"
           required
           style={{
             padding: 10,
@@ -166,7 +169,16 @@ const UpdateRecurringExpense = () => {
             outline: "none",
             fontSize: 14,
           }}
-        />
+        >
+          <option value="">Select Category</option>
+          <option value="Utilities">Utilities</option>
+          <option value="Subscriptions">Subscriptions</option>
+          <option value="Rent">Rent</option>
+          <option value="Salaries">Salaries</option>
+          <option value="Insurance">Insurance</option>
+          <option value="Loans">Loans</option>
+          <option value="Other">Other</option>
+        </select>
 
         <div className="form-group">
           <label htmlFor="frequency">Frequency</label>
@@ -176,6 +188,13 @@ const UpdateRecurringExpense = () => {
             value={expense.frequency}
             onChange={handleChange}
             required
+            style={{
+              padding: 10,
+              borderRadius: 6,
+              border: "1px solid #ccc",
+              outline: "none",
+              fontSize: 14,
+            }}
           >
             <option>Daily</option>
             <option>Weekly</option>

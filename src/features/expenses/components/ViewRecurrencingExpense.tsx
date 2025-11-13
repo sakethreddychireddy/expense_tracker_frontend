@@ -335,11 +335,13 @@ const ViewRecurringExpense = () => {
               color: #fff;
               text-transform: capitalize;
             }
-            .badge-rentals { background: #42a5f5; }
-            .badge-shopping { background: #ffa726; }
-            .badge-bills { background: #7e57c2; }
-            .badge-entertainment { background: #ec407a; }
-            .badge-education { background: #26a69a; }
+            .badge-rent { background: #42a5f5; }
+            .badge-subscriptions { background: #ffa726; }
+            .badge-utilities { background: #7e57c2; }
+            .badge-insurance { background: #ec407a; }
+            .badge-loans { background: #26a69a; }
+            .badge-others { background: #9e9e9e; }
+            .badge-salaries { background: #66bb6a; }
             .actions {
               display: flex;
               gap: 0.6rem;
