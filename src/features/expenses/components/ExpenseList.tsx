@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Expense } from "../types/expense";
 import {
@@ -42,30 +42,32 @@ const ExpenseList = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Fetch Expenses (with pagination)
-  const fetchExpenses = async (pageNumber = 1) => {
-    try {
-      setLoading(true);
-      const data = await getAllExpenses(pageNumber, pagination.pageSize);
+  // ✅ Fetch Expenses (Memoized for useEffect)
+  const fetchExpenses = useCallback(
+    async (pageNumber = 1) => {
+      try {
+        setLoading(true);
+        const data = await getAllExpenses(pageNumber, pagination.pageSize);
 
-      // ✅ Backend returns paginated object
-      setExpenses(data.items || []);
-      setFilteredExpenses(data.items || []);
-      setPagination({
-        pageNumber: data.pageNumber,
-        pageSize: data.pageSize,
-        totalPages: data.totalPages,
-        totalCount: data.totalCount,
-      });
-    } catch (error) {
-      console.error("Error fetching expenses", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setExpenses(data.items || []);
+        setFilteredExpenses(data.items || []);
+        setPagination({
+          pageNumber: data.pageNumber,
+          pageSize: data.pageSize,
+          totalPages: data.totalPages,
+          totalCount: data.totalCount,
+        });
+      } catch (error) {
+        console.error("Error fetching expenses", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pagination.pageSize]
+  );
 
-  // Fetch total expense
-  const fetchTotal = async () => {
+  // Fetch total (Memoized)
+  const fetchTotal = useCallback(async () => {
     try {
       const data = await getTotalExpenses();
       setTotal(data.totalAmount ?? 0);
@@ -73,7 +75,7 @@ const ExpenseList = () => {
       console.error("Error fetching total", error);
       setTotal(0);
     }
-  };
+  }, []);
 
   // Delete expense
   const handleDelete = async (id: number) => {
@@ -94,7 +96,7 @@ const ExpenseList = () => {
     }
   };
 
-  // Search by title or category
+  // Search
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     const lower = query.toLowerCase();
@@ -106,7 +108,7 @@ const ExpenseList = () => {
     setFilteredExpenses(filtered);
   };
 
-  // Sort by date
+  // Sort
   const handleSort = () => {
     const sorted = [...filteredExpenses].sort((a, b) => {
       const dateA = new Date(a.date).getTime();
@@ -117,7 +119,7 @@ const ExpenseList = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
-  // Filter by time period
+  // Filter by period
   const handleTimePeriodChange = (period: string) => {
     setTimePeriod(period);
     const now = new Date();
@@ -140,12 +142,13 @@ const ExpenseList = () => {
     setFilteredExpenses(filtered);
   };
 
+  // ✅ FIXED useEffect — dependencies added
   useEffect(() => {
     fetchExpenses(1);
     fetchTotal();
-  }, []);
+  }, [fetchExpenses, fetchTotal]);
 
-  // Pagination controls
+  // Pagination
   const nextPage = () => {
     if (pagination.pageNumber < pagination.totalPages) {
       fetchExpenses(pagination.pageNumber + 1);
@@ -303,7 +306,7 @@ const ExpenseList = () => {
               </tbody>
             </table>
 
-            {/* ✅ Pagination Controls */}
+            {/* Pagination */}
             <div className="pagination">
               <button onClick={prevPage} disabled={pagination.pageNumber === 1}>
                 ◀ Prev
