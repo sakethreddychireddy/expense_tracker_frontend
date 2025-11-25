@@ -20,9 +20,18 @@ const ExpenseList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [timePeriod, setTimePeriod] = useState<string>("all");
+
+  const [pagination, setPagination] = useState({
+    pageNumber: 1,
+    pageSize: 10,
+    totalPages: 1,
+    totalCount: 0,
+  });
+
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -33,11 +42,21 @@ const ExpenseList = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const fetchExpenses = async () => {
+  // ✅ Fetch Expenses (with pagination)
+  const fetchExpenses = async (pageNumber = 1) => {
     try {
-      const data = await getAllExpenses();
-      setExpenses(data);
-      setFilteredExpenses(data);
+      setLoading(true);
+      const data = await getAllExpenses(pageNumber, pagination.pageSize);
+
+      // ✅ Backend returns paginated object
+      setExpenses(data.items || []);
+      setFilteredExpenses(data.items || []);
+      setPagination({
+        pageNumber: data.pageNumber,
+        pageSize: data.pageSize,
+        totalPages: data.totalPages,
+        totalCount: data.totalCount,
+      });
     } catch (error) {
       console.error("Error fetching expenses", error);
     } finally {
@@ -45,6 +64,7 @@ const ExpenseList = () => {
     }
   };
 
+  // Fetch total expense
   const fetchTotal = async () => {
     try {
       const data = await getTotalExpenses();
@@ -55,12 +75,14 @@ const ExpenseList = () => {
     }
   };
 
+  // Delete expense
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this expense?")) {
       try {
         const res = await deleteExpense(id);
         setExpenses((prev) => prev.filter((exp) => exp.id !== id));
         setFilteredExpenses((prev) => prev.filter((exp) => exp.id !== id));
+
         if (res.updatedTotal !== undefined) {
           setTotal(res.updatedTotal);
         } else {
@@ -72,17 +94,19 @@ const ExpenseList = () => {
     }
   };
 
+  // Search by title or category
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    const lowerCaseQuery = query.toLowerCase();
+    const lower = query.toLowerCase();
     const filtered = expenses.filter(
       (exp) =>
-        exp.title.toLowerCase().includes(lowerCaseQuery) ||
-        exp.categoryName?.toLowerCase().includes(lowerCaseQuery)
+        exp.title.toLowerCase().includes(lower) ||
+        exp.categoryName?.toLowerCase().includes(lower)
     );
     setFilteredExpenses(filtered);
   };
 
+  // Sort by date
   const handleSort = () => {
     const sorted = [...filteredExpenses].sort((a, b) => {
       const dateA = new Date(a.date).getTime();
@@ -93,44 +117,50 @@ const ExpenseList = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
+  // Filter by time period
   const handleTimePeriodChange = (period: string) => {
     setTimePeriod(period);
     const now = new Date();
     let filtered = expenses;
 
-    if (period === "weekly") {
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(now.getDate() - 7);
-      filtered = expenses.filter((exp) => new Date(exp.date) >= oneWeekAgo);
-    } else if (period === "monthly") {
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(now.getMonth() - 1);
-      filtered = expenses.filter((exp) => new Date(exp.date) >= oneMonthAgo);
-    } else if (period === "quarterly") {
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(now.getMonth() - 3);
-      filtered = expenses.filter((exp) => new Date(exp.date) >= threeMonthsAgo);
-    } else if (period === "midyear") {
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(now.getMonth() - 6);
-      filtered = expenses.filter((exp) => new Date(exp.date) >= sixMonthsAgo);
-    } else if (period === "yearly") {
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(now.getFullYear() - 1);
-      filtered = expenses.filter((exp) => new Date(exp.date) >= oneYearAgo);
+    const periods: Record<string, number> = {
+      weekly: 7,
+      monthly: 30,
+      quarterly: 90,
+      midyear: 180,
+      yearly: 365,
+    };
+
+    if (period !== "all" && periods[period]) {
+      const daysAgo = new Date();
+      daysAgo.setDate(now.getDate() - periods[period]);
+      filtered = expenses.filter((exp) => new Date(exp.date) >= daysAgo);
     }
 
     setFilteredExpenses(filtered);
   };
 
   useEffect(() => {
-    fetchExpenses();
+    fetchExpenses(1);
     fetchTotal();
   }, []);
 
+  // Pagination controls
+  const nextPage = () => {
+    if (pagination.pageNumber < pagination.totalPages) {
+      fetchExpenses(pagination.pageNumber + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (pagination.pageNumber > 1) {
+      fetchExpenses(pagination.pageNumber - 1);
+    }
+  };
+
   return (
     <div className="modern-container">
-      {/* Profile Icon & Dropdown */}
+      {/* Profile Dropdown */}
       <div
         className="profile"
         ref={menuRef}
@@ -165,16 +195,19 @@ const ExpenseList = () => {
       </div>
 
       <div className="card">
-        {/* Header */}
-        <h3 className="header" style={{ textAlign: "center" }}>
+        <h3
+          className="header"
+          style={{ textAlign: "center", fontSize: "24px", fontWeight: "bold" }}
+        >
           📋 Expense List
         </h3>
         <p
           className="total-expense"
           style={{ textAlign: "center", fontSize: "20px" }}
         >
-          Total Expenses: <b color="red">${total.toFixed(2)}</b>
+          Total Expenses: <b>${total.toFixed(2)}</b>
         </p>
+
         <button
           onClick={() => navigate("/Dashboard")}
           style={{
@@ -187,16 +220,13 @@ const ExpenseList = () => {
             border: "none",
             borderRadius: "5px",
             cursor: "pointer",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-            transition: "background-color 0.3s ease",
             fontWeight: "bold",
-            fontSize: "14px",
           }}
         >
           Back
         </button>
 
-        {/* Search, Sort, and Time Period Controls */}
+        {/* Search & Sort Controls */}
         <div className="controls">
           <input
             type="text"
@@ -204,15 +234,6 @@ const ExpenseList = () => {
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             className="search-bar"
-            style={{
-              marginRight: "10px",
-              width: "60%",
-              padding: "8px",
-              fontSize: "14px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)",
-            }}
           />
           <button onClick={handleSort} className="sort-button">
             Sort by Date ({sortOrder === "asc" ? "Ascending" : "Descending"})
@@ -231,13 +252,11 @@ const ExpenseList = () => {
           </select>
         </div>
 
-        {/* Table or Empty State */}
+        {/* Table */}
         {loading ? (
-          <p className="loading">Loading expenses...</p>
+          <p>Loading expenses...</p>
         ) : filteredExpenses.length === 0 ? (
-          <div className="empty">
-            <p>🚀 No expenses found. Try adjusting your search!</p>
-          </div>
+          <p>🚀 No expenses found. Try adjusting your search!</p>
         ) : (
           <div className="table-wrapper">
             <table>
@@ -259,15 +278,13 @@ const ExpenseList = () => {
                     </td>
                     <td>
                       <span
-                        className={`badge badge-${exp.categoryName
-                          ?.toLowerCase()
-                          .replace(/\s+/g, "")}`}
+                        className={`badge badge-${exp.categoryName.toLowerCase()}`}
                       >
                         {exp.categoryName}
                       </span>
                     </td>
                     <td>{new Date(exp.date).toLocaleDateString()}</td>
-                    <td className="actions">
+                    <td>
                       <button
                         className="edit"
                         onClick={() => navigate(`/UpdateExpense/${exp.id}`)}
@@ -285,6 +302,23 @@ const ExpenseList = () => {
                 ))}
               </tbody>
             </table>
+
+            {/* ✅ Pagination Controls */}
+            <div className="pagination">
+              <button onClick={prevPage} disabled={pagination.pageNumber === 1}>
+                ◀ Prev
+              </button>
+              <span>
+                Page {pagination.pageNumber} of {pagination.totalPages}
+              </span>
+              <button
+                onClick={nextPage}
+                style={{ color: "blue", marginLeft: "1700px" }}
+                disabled={pagination.pageNumber === pagination.totalPages}
+              >
+                Next ▶
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -38,10 +38,20 @@ const handleResponse = (
 
 // ---------------- Expense APIs ----------------
 
-export const getAllExpenses = async () => {
-  const response = await axios.get(`${API_BASE_URL}/GetAllExpenses`, {
-    headers: getAuthHeaders(),
-  });
+// export const getAllExpenses = async () => {
+//   const response = await axios.get(`${API_BASE_URL}/GetAllExpenses`, {
+//     headers: getAuthHeaders(),
+//   });
+//   return handleResponse(response);
+// };
+
+export const getAllExpenses = async (pageNumber = 1, pageSize = 10) => {
+  const response = await axios.get(
+    `${API_BASE_URL}/GetAllExpenses?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    {
+      headers: getAuthHeaders(),
+    }
+  );
   return handleResponse(response);
 };
 

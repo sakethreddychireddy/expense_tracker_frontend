@@ -1,320 +1,334 @@
-/* --- Variables & Base Styles --- */
+/* ------------------------------
+   Global Theme & Variables
+------------------------------ */
 :root {
   --primary-color: #4f46e5; /* Indigo-600 */
   --primary-dark: #4338ca;
-  --secondary-color: #10b981; /* Emerald-500 */
-  --text-color: #333;
-  --light-text-color: #6b7280;
-  --background-light: #f9fafb;
-  --card-background: #ffffff;
-  --border-color: #e5e7eb;
+  --accent-color: #10b981; /* Emerald-500 */
   --danger-color: #ef4444; /* Red-500 */
   --danger-dark: #dc2626;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --background-color: #f9fafb;
+  --card-background: #ffffff;
+  --border-color: #e5e7eb;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --font-family: "Inter", system-ui, sans-serif;
+  --radius: 10px;
+  --transition: all 0.2s ease-in-out;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
+/* ------------------------------
+   Base Styles
+------------------------------ */
 body {
-  font-family: "Inter", sans-serif;
-  background-color: var(--background-light);
   margin: 0;
-  padding: 0;
-  color: var(--text-color);
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  line-height: 1.6;
 }
 
-/* --- Main Container & Card --- */
+/* Smooth hover animations */
+button,
+input,
+select {
+  transition: var(--transition);
+}
+
+/* ------------------------------
+   Layout Containers
+------------------------------ */
 /* .modern-container {
   max-width: 1200px;
   margin: 40px auto;
   padding: 20px;
-  position: relative;
 } */
 
 /* .card {
   background-color: var(--card-background);
-  border-radius: 12px;
-  padding: 30px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow-md);
-  margin-top: 20px;
+  padding: 25px 30px;
+  transition: var(--transition);
 } */
 
-.header {
-  color: var(--primary-color);
-  font-size: 1.8rem;
+/* .card:hover {
+  box-shadow: var(--shadow-lg);
+} */
+/* ------------------------------
+   Header Section
+------------------------------ */
+/* .header {
+  font-size: 2rem;
   font-weight: 700;
+  color: var(--primary-color);
   margin-bottom: 25px;
-}
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+} */
 
-/* --- Profile Dropdown --- */
+/* ------------------------------
+   Profile Dropdown
+------------------------------ */
 .profile-icon {
+  font-size: 1.8rem;
+  color: var(--text-secondary);
   cursor: pointer;
-  color: var(--light-text-color);
-  transition: color 0.2s ease-in-out;
   border-radius: 50%;
+  padding: 6px;
+  transition: var(--transition);
 }
 
 .profile-icon:hover {
+  background-color: var(--background-color);
   color: var(--primary-color);
 }
 
 .dropdown {
   position: absolute;
-  top: 50px; /* Adjust based on icon size */
+  top: 50px;
   right: 0;
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  width: 150px;
-  z-index: 1000;
-  box-shadow: var(--shadow-md);
+  width: 170px;
+  background-color: var(--card-background);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
+  z-index: 999;
 }
 
 .dropdown button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   width: 100%;
-  padding: 10px 15px;
-  text-align: left;
+  padding: 12px 15px;
   background: none;
   border: none;
+  text-align: left;
   cursor: pointer;
-  color: var(--text-color);
-  font-size: 14px;
-  transition: background-color 0.2s;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .dropdown button:hover {
-  background-color: var(--background-light);
+  background-color: #f3f4f6;
 }
 
-.dropdown button[style*="red"] {
-  color: var(--danger-color) !important;
+.dropdown button.logout {
+  color: var(--danger-color);
 }
 
-/* --- Controls Section (Search, Sort, Filter) --- */
+/* ------------------------------
+   Controls Section (Search, Filter, Sort)
+------------------------------ */
 .controls {
   display: flex;
-  gap: 15px;
-  margin-bottom: 5px;
   flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
   align-items: center;
-  justify-content: flex-start;
 }
 
 .search-bar,
 .time-period-dropdown {
   padding: 10px 15px;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  color: var(--text-primary);
+  width: 250px;
+  background-color: #fff;
 }
 
 .search-bar:focus,
 .time-period-dropdown:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
   outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .sort-button {
-  padding: 10px 15px;
   background-color: var(--primary-color);
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
+  border-radius: var(--radius);
+  padding: 10px 18px;
   font-size: 14px;
-  transition: background-color 0.3s ease;
-  white-space: nowrap;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
 }
 
 .sort-button:hover {
   background-color: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
-/* --- Expense Table --- */
+/* ------------------------------
+   Expense Table
+------------------------------ */
 .table-wrapper {
   overflow-x: auto;
+  border-radius: var(--radius);
 }
 
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  min-width: 600px; /* Ensures responsiveness */
+  min-width: 700px;
+  background-color: var(--card-background);
+  box-shadow: var(--shadow-sm);
 }
 
 thead th {
-  background-color: var(--background-light);
-  color: var(--light-text-color);
+  background-color: #1a3a7b;
+  color: white;
   font-weight: 600;
-  text-align: left;
+  text-align: center;
   padding: 12px 15px;
   border-bottom: 2px solid var(--border-color);
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
 tbody tr {
   border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.2s ease;
+  transition: var(--transition);
 }
 
 tbody tr:hover {
-  background-color: #f1f5f9; /* Subtle hover effect */
+  background-color: #f9fafb;
 }
 
 tbody td {
-  padding: 15px;
+  padding: 14px 15px;
   font-size: 14px;
-  vertical-align: middle;
+  text-align: center;
+  color: var(--text-primary);
 }
 
 .amount {
-  font-weight: 600;
   color: var(--primary-dark);
+  font-weight: 600;
 }
 
-/* --- Category Badges --- */
+/* ------------------------------
+   Category Badges
+------------------------------ */
 .badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 9999px;
   font-size: 12px;
-  white-space: nowrap;
+  font-weight: 500;
+  text-transform: capitalize;
 }
 
-/* Example Badge Colors - You should define colors for all your categories */
 .badge-food {
-  background-color: #fef2f2; /* Red-50 */
-  color: #b91c1c; /* Red-700 */
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 .badge-transportation {
-  background-color: #eff6ff; /* Blue-50 */
-  color: #1d4ed8; /* Blue-700 */
+  background-color: #dbeafe;
+  color: #1e3a8a;
 }
 .badge-utilities {
-  background-color: #f0fdf4; /* Green-50 */
-  color: #990b0b; /* Green-700 */
-}
-.badge-shopping {
-  background-color: #f5f3ff; /* Violet-50 */
-  color: #6d28d9; /* Violet-700 */
-}
-.badge-others,
-.badge-entertainment {
-  background-color: #fffbeb; /* Amber-50 */
-  color: #b45309; /* Amber-700 */
-}
-.badge-healthcare {
-  background-color: #ecfdf5; /* Emerald-50 */
-  color: #047857; /* Emerald-700 */
-}
-.badge-education {
-  background-color: #f3f4f6; /* Gray-50 */
-  color: #374151; /* Gray-700 */
+  background-color: #dcfce7;
+  color: #065f46;
 }
 .badge-miscellaneous {
-  background-color: #fdf4ff; /* Purple-50 */
-  color: #7e22ce; /* Purple-700 */
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+.badge-healthcare {
+  background-color: #ecfdf5;
+  color: #047857;
+}
+.badge-entertainment {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.badge-education {
+  background-color: #f3f4f6;
+  color: #374151;
 }
 
-/* --- Action Buttons --- */
-.actions button {
-  padding: 6px 10px;
-  margin-right: 5px;
+/* ------------------------------
+   Action Buttons
+------------------------------ */
+.actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+.edit,
+.delete {
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: all 0.2s;
 }
 
 .edit {
-  background-color: #1e88e5; /* Orange-500 */
-  color: white;
+  background: #42a5f5;
+  color: #fff;
+  margin-right: 0.5rem;
 }
-
 .edit:hover {
-  background-color: #1e88e5; /* Orange-600 */
+  background: #1e88e5;
 }
 
 .delete {
-  background-color: var(--danger-color);
-  color: white;
+  background: #ef5350;
+  color: #fff;
 }
-
 .delete:hover {
-  background-color: var(--danger-dark);
+  background: #c62828;
 }
 
-/* --- Empty/Loading States --- */
+
+/* ------------------------------
+   Empty / Loading States
+------------------------------ */
 .loading,
 .empty {
   text-align: center;
   padding: 50px 20px;
-  font-size: 1.1rem;
-  color: var(--light-text-color);
-  border: 2px dashed var(--border-color);
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
-.empty p {
-  margin: 0;
+  color: var(--text-secondary);
   font-weight: 500;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius);
+  margin-top: 20px;
+  background-color: #fff;
 }
 
-/* --- Media Queries for Responsiveness --- */
+/* ------------------------------
+   Responsive Design
+------------------------------ */
 @media (max-width: 768px) {
-  .modern-container {
-    margin: 20px 10px;
-    padding: 10px;
-  }
-
-  .card {
-    padding: 20px 15px;
-  }
-
   .header {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-
-  /* Stack controls vertically on small screens */
-  .controls {
+    font-size: 1.6rem;
     flex-direction: column;
+    align-items: flex-start;
     gap: 10px;
   }
 
-  .search-bar {
-    width: 100%;
-    margin-right: 0 !important;
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .sort-button,
-  .time-period-dropdown {
+  .search-bar,
+  .time-period-dropdown,
+  .sort-button {
     width: 100%;
-    text-align: center;
   }
 
-  /* Adjust table font size and padding */
-  tbody td {
-    padding: 10px;
+  table {
     font-size: 12px;
-  }
-
-  .actions button {
-    padding: 4px 8px;
-    font-size: 11px;
   }
 }

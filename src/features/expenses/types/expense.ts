@@ -20,6 +20,7 @@ export interface UpdateExpenseDto {
   date: string;
   categoryName: string;
   categoryId: number;
+  // UserId: number;
 }
 export interface RecurringExpenseDto {
   id: number;
