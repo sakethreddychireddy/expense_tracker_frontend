@@ -63,7 +63,7 @@ const ExpenseList = () => {
         setLoading(false);
       }
     },
-    [pagination.pageSize]
+    [pagination.pageSize],
   );
 
   // Fetch total (Memoized)
@@ -103,7 +103,7 @@ const ExpenseList = () => {
     const filtered = expenses.filter(
       (exp) =>
         exp.title.toLowerCase().includes(lower) ||
-        exp.categoryName?.toLowerCase().includes(lower)
+        exp.categoryName?.toLowerCase().includes(lower),
     );
     setFilteredExpenses(filtered);
   };

@@ -31,7 +31,7 @@ const Dashboard: React.FC = () => {
 
   const [showMenu, setShowMenu] = useState(false);
   const [categorySpending, setCategorySpending] = useState<CategorySpending[]>(
-    []
+    [],
   );
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
 
   const totalSpending = categorySpending.reduce(
     (sum, item) => sum + item.totalAmount,
-    0
+    0,
   );
 
   // ✅ Label renderer for PieChart (use Recharts label props -> payload)
@@ -251,8 +251,8 @@ const Dashboard: React.FC = () => {
                         activeIndex === null
                           ? "pie-slice"
                           : activeIndex === index
-                          ? "pie-slice pie-slice--active"
-                          : "pie-slice pie-slice--dimmed"
+                            ? "pie-slice pie-slice--active"
+                            : "pie-slice pie-slice--dimmed"
                       }
                       fill={COLORS[index % COLORS.length]}
                     />

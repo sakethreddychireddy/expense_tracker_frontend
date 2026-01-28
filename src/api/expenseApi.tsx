@@ -28,7 +28,7 @@ const getAuthHeaders = () => {
 // Handle responses and throw error if not successful
 const handleResponse = (
   response: any,
-  successStatus: number[] = [200, 201, 204]
+  successStatus: number[] = [200, 201, 204],
 ) => {
   if (!successStatus.includes(response.status)) {
     throw new Error(response.data?.message || "Request failed");
@@ -50,7 +50,7 @@ export const getAllExpenses = async (pageNumber = 1, pageSize = 10) => {
     `${API_BASE_URL}/GetAllExpenses?pageNumber=${pageNumber}&pageSize=${pageSize}`,
     {
       headers: getAuthHeaders(),
-    }
+    },
   );
   return handleResponse(response);
 };
@@ -73,7 +73,7 @@ export const updateExpense = async (id: number, expense: UpdateExpenseDto) => {
   const response = await axios.put(
     `${API_BASE_URL}/UpdateExpense/${id}`,
     expense,
-    { headers: getAuthHeaders() }
+    { headers: getAuthHeaders() },
   );
   return handleResponse(response);
 };
@@ -111,14 +111,14 @@ export const AddRecurringExpense = async (expense: RecurringExpenseDto) => {
 };
 export const updateRecurringExpense = async (
   id: number,
-  expense: RecurringExpenseDto
+  expense: RecurringExpenseDto,
 ) => {
   const response = await axios.put(
     `${API_URL}/UpdateRecurringExpense/${id}`,
     expense,
     {
       headers: getAuthHeaders(),
-    }
+    },
   );
   return handleResponse(response);
 };
@@ -133,7 +133,7 @@ export const deleteRecurringExpense = async (id: number) => {
     `${API_URL}/DeleteRecurringExpense/${id}`,
     {
       headers: getAuthHeaders(),
-    }
+    },
   );
   return handleResponse(response, [200, 204]);
 };
@@ -222,7 +222,7 @@ export const Logout = async () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     console.log("Logout successful:", response.data);

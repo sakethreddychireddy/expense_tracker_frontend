@@ -34,7 +34,7 @@ const UpdateExpense: React.FC = () => {
   }, [id]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setExpense((prev) =>
@@ -45,12 +45,12 @@ const UpdateExpense: React.FC = () => {
               name === "amount"
                 ? Number(value)
                 : name === "date"
-                ? new Date(value).toISOString()
-                : name === "categoryId"
-                ? Number(value)
-                : value,
+                  ? new Date(value).toISOString()
+                  : name === "categoryId"
+                    ? Number(value)
+                    : value,
           }
-        : prev
+        : prev,
     );
   };
 

@@ -25,7 +25,7 @@ const UpdateRecurringExpense = () => {
   }, [id]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setExpense((prev) =>
@@ -36,10 +36,10 @@ const UpdateRecurringExpense = () => {
               name === "amount"
                 ? Number(value)
                 : name === "date"
-                ? new Date(value).toISOString()
-                : value,
+                  ? new Date(value).toISOString()
+                  : value,
           }
-        : prev
+        : prev,
     );
   };
   const handleSubmit = async (e: React.FormEvent) => {

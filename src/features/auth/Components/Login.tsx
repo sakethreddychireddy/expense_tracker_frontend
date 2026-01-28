@@ -44,7 +44,7 @@ const Login: React.FC = () => {
       }
     } catch (error: any) {
       setErrorMessage(
-        error.response?.data?.message || "Login failed. Please try again."
+        error.response?.data?.message || "Login failed. Please try again.",
       );
     }
   };

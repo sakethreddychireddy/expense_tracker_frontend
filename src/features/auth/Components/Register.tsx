@@ -35,7 +35,7 @@ const Register: React.FC = () => {
 
       if (response) {
         setSuccessMessage(
-          "🎉 Registration successful! Redirecting to login..."
+          "🎉 Registration successful! Redirecting to login...",
         );
         setEmail("");
         setPassword("");
